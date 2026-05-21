@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>US Temperature Change Map</title>
+
+    <!-- ✅ Leaflet CSS (FIXED) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 80px);
+        }
+
+        #map {
+            flex: 2;
+        }
+
+        .sidebar {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            overflow-y: auto;
+            border-left: 2px solid #ddd;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+        }
+
+        .legend {
+            margin-top: 20px;
+        }
+
+        .legend div {
+            margin-bottom: 8px;
+        }
+
+        .color-box {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>US Temperature Change Map</h1>
+    <p>Temperature Trends from 1985 to 2025</p>
+</header>
+
+<div class="container">
+
+    <!-- ✅ Map -->
+    <div id="map"></div>
+
+    <!-- ✅ Description Panel -->
+    <div class="sidebar">
+        <h2>Project Description</h2>
+
+        <p>
+            This visualization shows temperature changes across major U.S. cities from 1985 to 2025.
+            Each circle marker represents a city, and the color reflects the magnitude of temperature increase.
+        </p>
+
+        <p>
+            Warmer colors indicate larger increases in temperature, which may suggest regional climate trends.
+        </p>
+
+        <h3>Legend</h3>
+        <div class="legend">
+            <div><span class="color-box" style="background: green;"></span>0–3°F Increase</div>
+            <div><span class="color-box" style="background: orange;"></span>4–5°F Increase</div>
+            <div><span class="color-box" style="background: red;"></span>6+°F Increase</div>
+        </div>
+
+        <h3>Notes</h3>
+        <p>
+            This dataset is simplified for demonstration purposes and does not include full climate variability.
+        </p>
+    </div>
+
+</div>
+
+<!-- ✅ Leaflet JS (FIXED) -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+// ✅ Step 1: Initialize Map
+var map = L.map('map').setView([39.5, -98.35], 4);
+
+// ✅ Step 2: Add Map Tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// ✅ Step 3: Dataset
+var data = [
+    {city: "New York", lat: 40.71, lon: -74.01, t1985: 55, t2005: 57, t2025: 60},
+    {city: "Los Angeles", lat: 34.05, lon: -118.24, t1985: 64, t2005: 66, t2025: 68},
+    {city: "Chicago", lat: 41.88, lon: -87.63, t1985: 51, t2005: 53, t2025: 56},
+    {city: "Houston", lat: 29.76, lon: -95.37, t1985: 69, t2005: 71, t2025: 74},
+    {city: "Phoenix", lat: 33.45, lon: -112.07, t1985: 74, t2005: 76, t2025: 80},
+    {city: "Seattle", lat: 47.61, lon: -122.33, t1985: 52, t2005: 54, t2025: 56},
+    {city: "Denver", lat: 39.74, lon: -104.99, t1985: 50, t2005: 52, t2025: 55},
+    {city: "Miami", lat: 25.76, lon: -80.19, t1985: 76, t2005: 78, t2025: 80}
+];
+
+// ✅ Step 4: Color Logic
+function getColor(change) {
+    if (change >= 6) return "red";
+    if (change >= 4) return "orange";
+    return "green";
+}
+
+// ✅ Step 5: Add Circle Markers
+data.forEach(function(d) {
+
+    var change = d.t2025 - d.t1985;
+
+    var marker = L.circleMarker([d.lat, d.lon], {
+        radius: 8,
+        fillColor: getColor(change),
+        color: "#333",
+        weight: 1,
+        fillOpacity: 0.8
+    }).addTo(map);
+
+    marker.bindPopup(
+        "<b>" + d.city + "</b><br>" +
+        "1985: " + d.t1985 + "°F<br>" +
+        "2005: " + d.t2005 + "°F<br>" +
+        "2025: " + d.t2025 + "°F<br>" +
+        "<b>Change: " + change + "°F</b>"
+    );
+});
+
+</script>
+
+</body>
+</html>
